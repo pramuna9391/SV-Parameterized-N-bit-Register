@@ -1,24 +1,57 @@
-module tb_example;
-    logic clk, rst, D;
-    logic Q;
+`timescale 1ns/1ps
 
-    dff_async_reset uut (
+module tb_register;
+
+    // Parameters
+    parameter N = 8;
+
+    // Testbench signals
+    logic clk;
+    logic rst;
+    logic [N-1:0] D;
+    logic [N-1:0] Q;
+
+    register #(N) uut (
         .clk(clk),
         .rst(rst),
         .D(D),
         .Q(Q)
     );
 
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+    // Stimulus
     initial begin
-        clk = 0;
-        forever #5 clk = ~clk; // 10ns clock period
+        $display("Starting Register Testbench");
+        $monitor("Time=%0t | rst=%b | D=%0h | Q=%0h", $time, rst, D, Q);
+
+        // Initial values
+        rst = 1;
+        D = 8'hAA;
+
+        #12;     // Wait a bit with reset active
+        rst = 0; // Release reset
+        #10;
+
+        D = 8'h55; // Change input
+        #10;
+
+        D = 8'hF0; // Change input
+        #10;
+
+        D = 8'h0F; // Change input
+        #10;
+
+        rst = 1; // Trigger reset again
+        #10;
+
+        rst = 0; // Release reset
+        D = 8'hA5;
+        #10;
+
+        $finish;
     end
 
-    initial begin
-        rst = 1; D = 0;
-        #12 rst = 0; D = 1;
-        #10 D = 0;
-        #10 D = 1;
-        #10 $finish;
-    end
 endmodule
+
