@@ -1,0 +1,24 @@
+module tb_example;
+    logic clk, rst, D;
+    logic Q;
+
+    dff_async_reset uut (
+        .clk(clk),
+        .rst(rst),
+        .D(D),
+        .Q(Q)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // 10ns clock period
+    end
+
+    initial begin
+        rst = 1; D = 0;
+        #12 rst = 0; D = 1;
+        #10 D = 0;
+        #10 D = 1;
+        #10 $finish;
+    end
+endmodule
